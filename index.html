@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <title>偽LINE風サイト</title>
+    <!-- 自作css -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.4/css/all.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+    <script>
+        jQuery(document).ready(function() {
+            var offset = $(document).height()+5000; //数字大きくしておかないとなぜかうまくいかない
+            var duration = 200;
+            jQuery(window).scroll(function() {
+                if (jQuery(this).scrollTop() < offset) {
+                        jQuery('#pagebottom').fadeIn(duration);
+                    } else {
+                        jQuery('#pagebottom').fadeOut(duration);
+                    }
+            });
+            jQuery('#pagebottom').click(function(event) {
+                event.preventDefault();
+                jQuery('#output').animate({scrollTop: offset}, duration);
+                return false;
+            })
+        });
+    </script>
+</head>
+
+<body>
+    
+<!-- コンテンツ表示画面 -->
+<div id="all">
+    <div id="sidebar"></div>
+    <div id="object">
+        <div id="output" style="overflow: auto; height: 80%;"><div id="pagebottom">↓</div></div>
+        <div id="input" style="overflow: auto; height: 19.8%;">
+            <form>
+                <div>
+                    <input type="text" id="uname" placeholder="ハンドル名">
+                    <div class="tooltip">ハンドル名は4～20文字です</div>
+                </div>
+                <div>
+                    <textarea id="text" placeholder="メッセージ"></textarea>
+                    <div class="tooltip">200文字まで入力可能です</div>
+                </div>
+            </form>
+            <div><button id="send">送信<i class="far fa-paper-plane"></i></button></div>
+        </div>
+    </div>
+</div>
+
+<!--/ コンテンツ表示画面 -->
+
+<!-- JQuery -->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+<!-- JQuery -->
+
+<!--** 以下Firebase **-->
+<!-- 入れたい機能
+・日付の表示をまとめる→多分ＯＫ
+・最新のところに戻るボタン→ＯＫ
+・Line風のデザイン→できたところまで
+・検索
+・フィルター
+・ファイル添付
+・一部データのみの読み込み
+・音声認識
+・取消ボタン
+・チャンネル分けられるように
+・入力補助機能
+・ハンドル名をローカルストレージに保存
+ -->
+
+ <!-- リサイズする部分の関数(JQuery) -->
+<script>
+    //サイドバーのリサイズ
+    $(function() {
+        $("#sidebar").resizable({
+            maxWidth: 1000,
+            minWidth: 400,
+            handles: "e" //右にのみハンドルを付けるという意味
+        });
+    });
+    //出力欄のリサイズ（ここもうまくいかなかったのでいったん諦める）
+    // $(function() {
+    //     $("#input" ).resizable({
+    //         maxHeight: 800,
+    //         minHeight: 100,
+    //         handles: "n" //上にのみハンドルを付けるという意味
+    //     });
+    // });
+
+    // $("#input").resize(function() {
+    //     let h=$(window).height()-$("#input").height()-2
+    //     $("#output").css("height",h+"px");
+    // });
+</script>
+
+
+<script type="module">
+    // 今日の日付を取得
+    const today = new Date();
+    // 初期の日付を設定
+    let tmpyear = 1900;
+    let tmpmonth = 1;
+    let tmpdate = 1;
+    const youbi=["月", "火", "水", "木", "金", "土", "日"]; // オブジェクトだとうまくいかなかった（数字でのキー指定がうまくいかない）ので、配列にした。{1: "月", 2: "火", 3: "水", 4: "木", 5: "金", 6: "土", 7: "日"};
+    // 昨日を判定する関数
+    function yesterday(year, month, date) {
+        let lyear=today.getFullYear();
+        let lmonth=today.getMonth()+1;
+        let ldate=today.getDate();
+        if (ldate>1) {
+            ldate-=1;
+        } else
+        if (lmonth>1) {
+            lmonth-=1;
+            //うるう年の判定（結構面倒くさい）
+            if (lmonth == 2) {
+                if (lyear%4==0 && (lyear%100!=0 || lyear%400==0)) {
+                    ldate=29;
+                } else {
+                    ldate=28;
+                };
+            } else
+            if (lmonth==4 || lmonth==6 || lmonth==9 || lmonth==11) {
+                ldate=30;
+            } else {
+                ldate=31;
+            };
+        } else {
+            lyear-=1;
+            lmonth=12;
+            ldate=31;
+        }
+        if (year==lyear && month==lmonth && date==ldate) {
+            return true;
+        } else {
+            return false;
+        };
+    };
+
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js";
+    import {getDatabase, ref, push, set, onChildAdded, remove, onChildRemoved} from "https://www.gstatic.com/firebasejs/9.1.1/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCY3ouHwxBuC4BuCh0QrxPJvoOI1YsHQgg",
+      authDomain: "sample-3665a.firebaseapp.com",
+      projectId: "sample-3665a",
+      storageBucket: "sample-3665a.appspot.com",
+      messagingSenderId: "856993011261",
+      appId: "1:856993011261:web:d24c4cfd3ce4a2adb1fc54"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, "chat");
+
+    //送信
+    $("#send").on("click", function() {
+        var date=new Date();
+        const msg = {
+            uname: $("#uname").val(),
+            text: $("#text").val(),
+            year: date.getFullYear(),
+            month: date.getMonth(),
+            date: date.getDate(),
+            day: date.getDay(),
+            hour: date.getHours(),
+            minute: date.getMinutes()
+        };
+        if (msg.uname=="") {
+
+        };
+        const newPostRef = push(dbRef); //ユニークキーを生成
+        set(newPostRef, msg);
+        document.getElementById("text").value='';
+        document.getElementById("pagebottom").click();
+    });
+
+    //データ登録(Enter)
+    $("#text").on("keydown",function(e){
+        var date=new Date();
+        if(e.ctrlKey&&e.keyCode==13){   //EnterKey=13
+            const msg = {
+                uname: $("#uname").val(),
+                text: $("#text").val(),
+                year: date.getFullYear(),
+                month: date.getMonth(),
+                date: date.getDate(),
+                day: date.getDay(),
+                hour: date.getHours(),
+                minute: date.getMinutes()
+            };
+            const newPostRef = push(dbRef); //ユニークKEYを生成
+            set(newPostRef, msg);           //"chat"にユニークKEYをつけてオブジェクトデータを登録
+            document.getElementById("text").value='';
+            document.getElementById("pagebottom").click();
+        }
+    });
+
+    //最初にデータ取得&onSnapshotでリアルタイムにデータを取得
+    let count=0;
+    onChildAdded(dbRef, function(data){
+        const msg=data.val();
+        const key=data.key;
+        if (msg.year>tmpyear || msg.month>tmpmonth || msg.date>tmpdate) {
+            tmpyear=msg.year;
+            tmpmonth=msg.month+1; //monthは1少ない数で作られるようなので注意
+            tmpdate=msg.date;
+            if (yesterday(tmpyear,tmpmonth,tmpdate)) {
+                $("#output").append("<p class='date'>昨日</p>")
+            } else
+            if (tmpyear==today.getFullYear() && tmpmonth==today.getMonth()+1 && tmpdate==today.getDate()) {
+                $("#output").append("<p class='date'>今日</p>")
+            } else {
+                let d="<p class='date'>"+msg.year+"/"+msg.month+"/"+msg.date+"("+youbi[msg.day-1]+")</p>";
+                $("#output").append(d);
+            };
+        };
+        let h = '<div class="box">' ;
+            h+= '<div class="left"><p class="user">'+msg.uname+'</p><p class="time">'+msg.hour+':'+msg.minute+'</p></div>';
+            if (count%2==0){
+                h+= '<div class="msg1">'+msg.text+'</div>';
+            } else {
+                h+= '<div class="msg2">'+msg.text+'</div>';
+            };
+            h+= '</div>';
+            $("#output").append(h);
+        count+=1;
+    });
+</script>
+
+<script>
+    //フォームのtipsを出している部分
+    let elms = document.querySelectorAll('form input[type=text],form textarea');
+    for (let i = 0; i < elms.length; i++) {
+        elms[i].onfocus = function () {
+            let = tooltip = this.parentNode.querySelector('.tooltip');
+            tooltip.style.display = 'inline-block';
+        };
+        elms[i].onblur = function () {
+            let = tooltip = this.parentNode.querySelector('.tooltip');
+            tooltip.style.display = 'none';
+        }
+    }
+</script>
+</body>
+</html>
