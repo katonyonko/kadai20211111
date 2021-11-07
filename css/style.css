@@ -22,7 +22,7 @@ body {
 #sidebar {
   width: 400px;
   height: 100%;
-  background-color: #fff;  
+  background-color: #eee;  
   border-right: 2px solid #ccc;
 }
 
@@ -37,7 +37,7 @@ body {
 }
 
 .date {
-  width: 10%;
+  width: 100px;
   margin: 20px auto;
   text-align: center;
   background-color: #fff;
@@ -133,7 +133,6 @@ body {
 
 #send:hover {
   cursor: pointer;
-  background-color: #a5f1a5;
 }
 
 form {
@@ -190,4 +189,117 @@ input[type="text"],textarea {
 	color: #fff !important;
 	background-color: #a5f1a5;
 	text-decoration: none;
+}
+
+#icon {
+  height: 110px;
+  width: 280px;
+  border-radius:40px;
+  background-color: #00B900;
+  margin: auto;
+  margin-top: 10px;
+  padding-top: 15px;
+  user-select:none;
+}
+
+#icon:hover {
+  cursor: pointer; 
+  opacity: 0.5 ;
+}
+
+#icon-inner {
+  text-align: center;
+  background-color: #fff;
+  height: 80px;
+  width: 250px;
+  border-radius:100%;
+  padding-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family:"ヒラギノ丸ゴ Pro W4","ヒラギノ丸ゴ Pro","Hiragino Maru Gothic Pro","ヒラギノ角ゴ Pro W3","Hiragino Kaku Gothic Pro","HG丸ｺﾞｼｯｸM-PRO","HGMaruGothicMPRO";
+  box-shadow:5px 2px;
+  border:1px solid #fff;
+}
+
+#title1 {
+  font-size: 30px;
+  color: #00B900;
+  font-weight: 1000;
+  text-shadow: 1px 2px 3px #808080;
+  line-height: 0;
+}
+
+#title2 {
+  font-size: 15px;
+  line-height: 0;
+}
+
+#channel-add {
+  margin-top: 10px;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  user-select:none;
+}
+
+#channel-add:hover {
+  cursor: pointer; 
+  opacity: 0.5 ;
+}
+
+#plus {
+  width: 25px;
+  text-align: center;
+  background-color: #fff;
+  border-radius:30%;
+}
+
+#channel-input {
+  text-align: center;
+  width: 100%;
+}
+
+#chname {
+  height: 25px;
+  width: 190px;
+  border-radius: 7px;
+  font-family: "メイリオ" ;
+  font-size: 16px;
+  border-radius:10px;
+  padding: 2px 8px;
+  border: 2px solid #ccc;
+}
+
+#make {
+  height: 35px;
+  width: 70px;
+  border-radius: 7px;
+  font-family: "メイリオ" ;
+  font-size: 16px;
+  border-radius:10px;
+  padding: 2px 8px;
+  border: 2px solid #ccc;
+}
+
+#make:hover {
+  cursor: pointer;
+}
+
+#new_channel {
+  text-align: center;
+  height: 100px;
+  width: 250px;
+  border-radius:10px;
+  padding: 2px 8px;
+  border: 2px solid #ccc;
+  margin-top: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  user-select:none;
+  background-color: #fff;
+}
+
+#new_channel:hover {
+  cursor: pointer;
+  background-color: #ccc;
 }

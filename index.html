@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="utf-8">
-    <title>偽LINE風サイト</title>
+    <title>チャットアプリ</title>
+    <link rel="shortcut icon" href="img/favicon.png">
     <!-- 自作css -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
@@ -35,7 +36,12 @@
     
 <!-- コンテンツ表示画面 -->
 <div id="all">
-    <div id="sidebar"></div>
+    <div id="sidebar">
+        <div id="icon"><div id="icon-inner"><p id="title1">Chat App</p><p id="title2">G's Academy</p></div></div>
+        <div id="channel-add"><div id="plus">+</div>チャンネルを追加する</div>
+        <div id="channel-input"></div>
+        <div id="channel"></div>
+    </div>
     <div id="object">
         <div id="output" style="overflow: auto; height: 80%;"><div id="pagebottom">↓</div></div>
         <div id="input" style="overflow: auto; height: 19.8%;">
@@ -74,6 +80,7 @@
 ・チャンネル分けられるように
 ・入力補助機能
 ・ハンドル名をローカルストレージに保存
+・背景切替ボタン
  -->
 
  <!-- リサイズする部分の関数(JQuery) -->
@@ -179,6 +186,7 @@
             hour: date.getHours(),
             minute: date.getMinutes()
         };
+        //エラーチェック（作りかけ）
         if (msg.uname=="") {
 
         };
@@ -188,7 +196,7 @@
         document.getElementById("pagebottom").click();
     });
 
-    //データ登録(Enter)
+    //データ登録(Ctrl+Enter)
     $("#text").on("keydown",function(e){
         var date=new Date();
         if(e.ctrlKey&&e.keyCode==13){   //EnterKey=13
@@ -224,7 +232,7 @@
             if (tmpyear==today.getFullYear() && tmpmonth==today.getMonth()+1 && tmpdate==today.getDate()) {
                 $("#output").append("<p class='date'>今日</p>")
             } else {
-                let d="<p class='date'>"+msg.year+"/"+msg.month+"/"+msg.date+"("+youbi[msg.day-1]+")</p>";
+                let d="<p class='date'>"+msg.year+"/"+(msg.month+1)+"/"+msg.date+"("+youbi[msg.day-1]+")</p>";
                 $("#output").append(d);
             };
         };
@@ -239,7 +247,37 @@
             $("#output").append(h);
         count+=1;
     });
+
+    //アイコンがクリックされたときに更新
+    $("#icon").on("click", function() {
+        location.reload();
+    });
+
+    //チャンネルの追加ボタンの動作を記述
+    let channel_clicked=0;
+    $("#channel-add").on("click", function() {
+        if (channel_clicked==0) {
+            $("#channel-add").html('<div id="plus">-</div>チャンネルの追加を中止する')
+            let p='<div id="channel-input-form"><input type="text" id="chname" placeholder="チャンネル名を入力"><button id="make">作成</button></div>';
+            $("#channel-input").append(p);
+            channel_clicked=1;
+            $("#make").on("click", function() {
+                let elem='<div><div id="new_channel">';
+                    elem+=$("#chname").val();
+                    elem+='</div></div>';
+                $("#channel").append(elem);
+                $("#channel-add").html('<div id="plus">+</div>チャンネルを追加する')
+                $("#channel-input").empty();
+                channel_clicked=0;
+            });
+        } else {
+            $("#channel-add").html('<div id="plus">+</div>チャンネルを追加する')
+            $("#channel-input").empty();
+            channel_clicked=0;
+        };
+    });
 </script>
+
 
 <script>
     //フォームのtipsを出している部分
