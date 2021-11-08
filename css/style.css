@@ -289,7 +289,7 @@ input[type="text"],textarea {
   cursor: pointer;
 }
 
-#new_channel {
+.new_channel {
   text-align: center;
   height: 100px;
   width: 250px;
@@ -303,7 +303,7 @@ input[type="text"],textarea {
   background-color: #fff;
 }
 
-#new_channel:hover {
+.new_channel:hover {
   cursor: pointer;
-  background-color: #ccc;
+  background-color: #eee;
 }
