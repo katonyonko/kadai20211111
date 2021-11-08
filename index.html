@@ -192,7 +192,7 @@
             set(newPostRef, msg);           //"chat"にユニークKEYをつけてオブジェクトデータを登録
             document.getElementById("text").value='';
             document.getElementById("pagebottom").click();
-        }
+        };
     });
 
     //最初にデータ取得&onSnapshotでリアルタイムにデータを取得
@@ -229,7 +229,7 @@
                 const msg=data.val();
                 const key=data.key;
                 if (key[0]=='-') { //登録されたメッセージであることを判定
-                    if (msg.year>tmpyear || msg.month>tmpmonth || msg.date>tmpdate) {
+                    if (msg.year>tmpyear || msg.month+1>tmpmonth || msg.date>tmpdate) {
                         tmpyear=msg.year;
                         tmpmonth=msg.month+1; //monthは1少ない数で作られるようなので注意
                         tmpdate=msg.date;
@@ -265,12 +265,14 @@
 
     //チャンネルの追加ボタンの動作を記述
     let channel_clicked=0;
+    let tmp_channel_name='';
     $("#channel-add").on("click", function() {
         if (channel_clicked==0) {
             $("#channel-add").html('<div id="plus">-</div>チャンネルの追加を中止する')
             let p='<div id="channel-input-form"><input type="text" id="chname" placeholder="チャンネル名を入力"><button id="make">作成</button></div>';
             $("#channel-input").append(p);
             channel_clicked=1;
+            document.getElementById("chname").value=tmp_channel_name;
             $("#make").on("click", function() {
                 var date=new Date();
                 let chname=$("#chname").val();
@@ -287,12 +289,37 @@
                     hour: date.getHours(),
                     minute: date.getMinutes(),
                     ref: newPostRef._path.pieces_[1]
-                    };
+                };
                 set(newPostRef, chan);
                 channel_clicked=0;
                 document.getElementById(newPostRef._path.pieces_[1]).click();
             });
+            $("#chname").on("keydown", function(e) {
+                var date=new Date();
+                if(e.ctrlKey&&e.keyCode==13){ 
+                    let chname=$("#chname").val();
+                    $("#channel-add").html('<div id="plus">+</div>チャンネルを追加する')
+                    $("#channel-input").empty();
+                    //firebaseにチャンネルを追加
+                    const newPostRef = push(ref(db, "chat")); //ユニークキーを生成
+                    const chan = {
+                        cname: chname,
+                        year: date.getFullYear(),
+                        month: date.getMonth(),
+                        date: date.getDate(),
+                        day: date.getDay(),
+                        hour: date.getHours(),
+                        minute: date.getMinutes(),
+                        ref: newPostRef._path.pieces_[1]
+                    };
+                    set(newPostRef, chan);
+                    channel_clicked=0;
+                    document.getElementById(newPostRef._path.pieces_[1]).click();
+                };
+            });
         } else {
+            tmp_channel_name=$("#chname").val();
+            console.log(tmp_channel_name);
             $("#channel-add").html('<div id="plus">+</div>チャンネルを追加する')
             $("#channel-input").empty();
             channel_clicked=0;
