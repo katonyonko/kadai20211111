@@ -22,7 +22,7 @@
         <div id="icon"><div id="icon-inner"><p id="title1">Chat App</p><p id="title2">G's Academy</p></div></div>
         <div id="channel-add"><div id="plus">+</div>チャンネルを追加する</div>
         <div id="channel-input"></div>
-        <div id="channel" style="overflow: auto; height: 80%;"></div>
+        <div id="channel" style="overflow: auto; height: 75%;"></div>
     </div>
     <div id="object">
         <div id="output" style="overflow: auto; height: 80%;"></div>
@@ -94,10 +94,6 @@
 <script type="module">
     // 今日の日付を取得
     const today = new Date();
-    // 初期の日付を設定
-    let tmpyear = 1900;
-    let tmpmonth = 1;
-    let tmpdate = 1;
     const youbi=["月", "火", "水", "木", "金", "土", "日"]; // オブジェクトだとうまくいかなかった（数字でのキー指定がうまくいかない）ので、配列にした。{1: "月", 2: "火", 3: "水", 4: "木", 5: "金", 6: "土", 7: "日"};
     // 昨日を判定する関数
     function yesterday(year, month, date) {
@@ -200,7 +196,7 @@
     });
 
     //最初にデータ取得&onSnapshotでリアルタイムにデータを取得
-    onChildAdded(dbRef, function(data){
+    onChildAdded(ref(db, "chat"), function(data){
         const channel=data.val();
         let elem='<div><div class="new_channel" id="'+channel.ref+'">';
             elem+=channel.cname;
@@ -208,6 +204,13 @@
             $("#channel").append(elem);
         $("#"+channel.ref).on("click", function() {
             $("#"+dbRef._path.pieces_[1]).css("background-color","#fff");
+            $("#"+dbRef._path.pieces_[1]).hover(function() {
+                //マウスを乗せたら色が変わる
+                $(this).css('background', '#eee');
+                }, function() {
+                //色指定を空欄にすれば元の色に戻る
+                $(this).css('background', '');
+                });
             $("#"+channel.ref).css("background-color","#ccc");
             $("#output").html('<div id="pagebottom">↓</div>');
             $('#pagebottom').click(function(event) {
@@ -218,6 +221,10 @@
             document.getElementById("pagebottom").click();
             dbRef=ref(db, "chat/"+channel.ref);
             let count=0;
+            // 初期の日付を設定
+            let tmpyear = 1900;
+            let tmpmonth = 1;
+            let tmpdate = 1;
             onChildAdded(dbRef, function(data){
                 const msg=data.val();
                 const key=data.key;
@@ -244,7 +251,7 @@
                             h+= '<div class="msg2">'+msg.text+'</div>';
                         };
                         h+= '</div>';
-                        $("#output").append(h);
+                    $("#output").append(h);
                     count=1-count;
                 };
             });

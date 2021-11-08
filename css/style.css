@@ -82,7 +82,7 @@ body {
   border-radius:20px;
   padding: 10px 10px;
   box-shadow:3px 3px rgba(102, 68, 0, 0.5);
-  border:1px solid #fff;
+  border:1px solid #ccc;
 }
 
 .msg2 {
@@ -92,7 +92,7 @@ body {
   border-radius:20px;
   padding: 10px 10px;
   box-shadow:3px 3px rgba(102, 68, 0, 0.5);;
-  border:1px solid #fff;
+  border:1px solid #ccc;
 }
 
 #input {
@@ -306,4 +306,8 @@ input[type="text"],textarea {
 .new_channel:hover {
   cursor: pointer;
   background-color: #eee;
+}
+
+#channel {
+  margin-top: 10px;
 }
